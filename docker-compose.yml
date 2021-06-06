@@ -8,7 +8,6 @@ services:
     ports:
       - "4566:4566"
       - "4571:4571"
-     # - "${PORT_WEB_UI-8080}:${PORT_WEB_UI-8080}"
     environment:
       - SERVICES=s3,lambda,iam,sqs,cloudformation,sts,ssm
       - DEBUG=1
