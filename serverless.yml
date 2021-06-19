@@ -1,4 +1,4 @@
-service: myServerless 
+service: myServerless
 frameworkVersion: '2'
 
 custom:
@@ -32,36 +32,27 @@ provider:
       Resource: "*"
   environment:
     THUMBNAIL_SIZE: 100
+  deploymentBucket:
+    name: dilum-serverless-deployment-bucket
 
 plugins:
-  - serverless-offline
+  #- serverless-offline
   - serverless-localstack
+  - serverless-deployment-bucket
 package:
   excludeDevDependencies: true
 #  include:
 #    - include-me.js
 #    - include-me-dir/**
-#  exclude:
+  exclude:
+#    - node_modules/**
+    - buckets/**
 #    - exclude-me.js
 #    - exclude-me-dir/**
 
 functions:
-  # testS3:
-  #   handler: handler.hello
-  #   name: dev-test-s3-local
-  #   events:
-  #     - s3:
-  #         bucket: testBucketS3LocalTest
-  #         event: s3:ObjectCreated:Put
-  #         existing: true
-  # testApi:
-  #   handler: handler.hello
-  #   events:
-  #   - http:
-  #     path: helloo
-  #     method: get
   hello:
-    handler: handler.hello
+    handler: src/handler.hello
     name: ${opt:stage, self:provider.stage, "dev"}-${self:service}
     events:
       - sqs:
@@ -88,6 +79,10 @@ resources:
       DependsOn:
         - homeWorkerQueue
         - HomeSQSPolicy
+    homeUploadThumbBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${opt:stage, self:provider.stage, "dev"}-dilum-home-thumb-images
     homeWorkerQueue:
       Type: AWS::SQS::Queue
       Properties:
@@ -119,32 +114,17 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: ${opt:stage, self:provider.stage, "dev"}-home-workerDlq
-    
-    # homeDynamoDb:
-    #   Type: 'AWS::DynamoDB::Table'
-    #   DeletionPolicy: Delete
-    #   Properties:
-    #     TableName: ${opt:stage, self:provider.stage, "dev"}-home-images
-    #     AttributeDefinitions:
-    #       - AttributeName: image
-    #         AttributeType: S
-    #     KeySchema:
-    #       - AttributeName: image
-    #         KeyType: HASH
-    #     ProvisionedThroughput:
-    #       ReadCapacityUnits: 1
-    #       WriteCapacityUnits: 1
-    # homeWorkerQueue:
-    #   Type: AWS::SQS::Queue
-    #   Properties:
-    #     QueueName: ${opt:stage, self:provider.stage, "dev"}-home-workerQueue
-    #     RedrivePolicy:
-    #       deadLetterTargetArn:
-    #         Fn::GetAtt:
-    #           - WorkerDLQ
-    #           - Arn
-    #       maxReceiveCount: 5
-    # homeWorkerDLQ:
-    #   Type: AWS::SQS::Queue
-    #   Properties:
-    #     QueueName: ${opt:stage, self:provider.stage, "dev"}-home-workerDlq
+    homeDynamoDb:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Delete
+      Properties:
+        TableName: ${opt:stage, self:provider.stage, "dev"}-home-images
+        AttributeDefinitions:
+          - AttributeName: image
+            AttributeType: S
+        KeySchema:
+          - AttributeName: image
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5

@@ -4,10 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "serverless-deployment-bucket": "^1.5.1",
     "serverless-localstack": "^0.4.32",
-    "serverless-offline": "^6.9.0",
-    "serverless-offline-sqs": "^4.1.1",
-    "serverless-s3-local": "^0.6.17"
+    "serverless-offline": "^7.0.0"
   },
   "dependencies": {
     "luxon": "^1.27.0"

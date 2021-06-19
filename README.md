@@ -21,13 +21,21 @@ docker-compose config
 2. Using docker run command
 
 ```
-docker run --rm -it -p 4566:4566 -p 4571:4571 -v /private/tmp/localstack:/tmp/localstack -v /var/run/docker.sock:/var/run/docker.sock -e SERVICES=s3,lambda,iam,sqs,cloudformation,sts,ssm -e DEBUG=1 -e  DATA_DIR=/data -e LAMBDA_EXECUTOR=docker -e DOCKER_HOST=unix:///var/run/docker.sock --name my_localstack  localstack/localstack
+docker run --rm -it -p 4566:4566 -p 4571:4571 -v /private/tmp/localstack:/tmp/localstack -v /var/run/docker.sock:/var/run/docker.sock -e SERVICES=s3,lambda,iam,sqs,cloudformation,sts,ssm -e DEBUG=1 -e DATA_DIR=/tmp/localstack/data -e LAMBDA_EXECUTOR=docker AWS_DEFAULT_REGION=us-west-2 -e DOCKER_HOST=unix:///var/run/docker.sock --name my_localstack  localstack/localstack
 ```
 
 Once the localstack up and running, can confirm all required AWS services are running
 
 ```
 http://localhost:4566/health
+```
+
+How set ssm parameters
+
+```
+aws --endpoint-url=http://localhost:4566 ssm put-parameter --name "lambda/common/VPC_SECURITY_GROUP_ID" --value "<my_sec_group>"
+aws --endpoint-url=http://localhost:4566 ssm put-parameter --name "lambda/common/VPC_SUBNET_ID" --value "<my_vpc_id_1>"
+aws --endpoint-url=http://localhost:4566 ssm put-parameter --name "lambda/common/VPC_SUBNET_ID2" --value "<my_vpc_id_2>"
 ```
 
 How to deploy locally
@@ -40,6 +48,11 @@ How to deploy AWS
 
 ```
 SLS_DEBUG=* sls deploy -v --stage dev
+```
+
+How to test the flow
+```
+aws --endpoint-url=http://localhost:4566 s3 cp /private/var/www/images/image.jpg s3://local-dilum-home-images --region=us-west-2
 ```
 
 How validate each services taken placed. Execute the following commands from command line tool
