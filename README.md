@@ -82,6 +82,14 @@ aws --endpoint-url=http://localhost:4566 sqs get-queue-url --queue-name 'local-h
 aws --endpoint-url=http://localhost:4566 sqs receive-message --queue-url http://localhost:4566/000000000000/local-home-workerDlq --region us-west-2
 ```
 
+DynamoDB:
+```
+#List all tables:
+aws --endpoint-url=http://localhost:4566 dynamodb list-tables
+#Get items in the table
+aws --endpoint-url=http://localhost:4566 dynamodb scan --table-name=local-home-images --region=us-west-2
+```
+
 Lambda:
 ```
 aws --endpoint-url=http://localhost:4566 lambda list-functions --region=us-west-2
